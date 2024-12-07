@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="{% static 'imgs/logo2.png' %}" type="image/x-icon">
+
+  <title>AptiQuiz | Aptitude Quiz Platform</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/cover/">
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static 'dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="{% static 'css/home.css' %}" rel="stylesheet">
+</head>
+<body class="{% if not page %}text-center{%endif%}">
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+      <header class="masthead mb-auto">
+        <div class="inner">
+          <h3 class="masthead-brand"><a href="">AptiQuiz</a></h3>
+          <nav class="nav nav-masthead justify-content-center pl-5">
+            <a class="nav-link {% if not page %}active{%endif%}" href="{% url 'home' %}">Home</a>
+            <a class="nav-link {% if page == 'login' %}active{%endif%}" href="{% url 'login' %}">Sign-In</a>
+            <a class="nav-link {% if page == 'register' %}active{%endif%}" href="{% url 'signup' %}">Sign-Up</a>
+          </nav>
+        </div>
+      </header>
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" id="msg">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+  {% block content %}
+  
+  {% endblock  %}
+
+    <footer class="mastfoot mt-auto">
+      <div class="inner text-center">
+        <p>&copy All rights reserved <a href="">AptiQuiz</a>.</p>
+      </div>
+    </footer>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="{% static 'assets/js/vendor/popper.min.js' %}"></script>
+<script src="{% static 'dist/js/bootstrap.min.js' %}"></script>
+
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Include jQuery Validation Plugin -->
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="{% static 'js/register.js' %}"></script>
+
+</body>
+</html>

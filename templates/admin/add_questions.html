@@ -1,0 +1,67 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+{% load admin_tags %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="">
+    <h2 class="mb-4 ml-3">Add Questions to {{ quiz.name }}</h2>
+    <form method="post" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+        {% for form in forms %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Question {{ forloop.counter }}</h5>
+            </div>
+            <div class="card-body">
+                {{ form.media }}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.topic.id_for_label }}">Topic</label>
+                        {{ form.topic|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.image.id_for_label }}">Image</label>
+                        {{ form.image|add_class:"form-control-file" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.question.id_for_label }}">Question</label>
+                    {{ form.question|add_class:"form-control" }}
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.option_1.id_for_label }}">Option 1</label>
+                        {{ form.option_1|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.option_2.id_for_label }}">Option 2</label>
+                        {{ form.option_2|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.option_3.id_for_label }}">Option 3</label>
+                        {{ form.option_3|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.option_4.id_for_label }}">Option 4</label>
+                        {{ form.option_4|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.answer.id_for_label }}">Correct Answer</label>
+                    {{ form.answer|add_class:"form-control" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary add_btn">Add Questions</button>
+        </div>
+        <br><br><br>
+    </form>
+</div>
+
+{% endblock %}

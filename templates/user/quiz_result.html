@@ -1,0 +1,263 @@
+{% load static %}
+{% load quiz_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'imgs/logo2.png' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/user.css' %}" rel="stylesheet">
+    <title>{{ user.first_name }} {{ user.last_name}} | Result - {{quiz.name}}</title>
+
+    <style>
+        .result-card .message{
+            margin-top: 50px;
+            margin-bottom: 50px;
+            font-size: 25px;
+        }
+
+        .result-card .message img{
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .result-card .result-table{
+            width: 80%;
+        }
+
+        .result-table td {
+            width: 50%;
+        }
+
+        .result-table .left {
+            text-align: right;
+        }
+
+        .result-table .final {
+            font-size: larger;
+            font-weight: bold;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .question ol li {
+            line-height: 40px;
+        }
+
+        .not-answered {
+            background-color: snow; /* Light red for not answered */
+        }
+
+        .correct-answer {
+            background-color: #d4edda; /* Light green for correct answer */
+        }
+
+        .wrong-answer {
+            background-color: #f2dede; /* Light red for wrong answer */
+        }
+
+        .q-img{
+            width: 50%;
+            height: 10%;
+        }
+        .r-img{
+            width: 30px;
+            height: 30px;
+            margin-left: 20px;
+        }
+
+        @media only screen and (max-width: 600px)  {
+            h2{
+                font-size: 28px;
+            }
+
+            .result-card .message{
+                font-size: 16px;
+            }
+
+            .result-card .message img{
+                width: 28px;
+                height: 28px;
+                margin-right: 5px;
+            }
+            .result-table td {
+                font-size: 14px;
+            }
+
+            .result-table .final {
+                font-size: 16px !important;
+            }
+
+            .q-img{
+                width: 100%;
+                height: 30%;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #011F37;">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" href="#" >AptiQuiz</a>
+        
+        <!-- Toggler button for small screens -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navigation links on the right side -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto"> <!-- Use ml-auto class here -->
+                <li class="nav-item active">
+                    <b class="nav-link">{{ user.first_name }} {{ user.last_name}}</b>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" id="msg">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container mt-4">
+        <div class="card result-card text-center">
+            <div class="card-body">
+                <h2>{{ quiz.name }} - Result  {{session.end_time|date:"F j, Y"}}</h2>
+                {% if requester != 'admin' %}
+                    {% if score_percent >= 90 %}
+                    <p class="message">
+                        <img src="{% static 'imgs/brilliant.png' %}" alt="">
+                        WOW ! You're Brilliant !
+                    </p>
+                    {% elif score_percent < 90 and score_percent >= 65 %}
+                    <p class="message">
+                        <img src="{% static 'imgs/good.png' %}" alt="">
+                        Nice, Good Result !
+                    </p>
+                    {% elif score_percent < 65 and score_percent >= 35 %}
+                    <p class="message">
+                        <img src="{% static 'imgs/pass.png' %}" alt="">
+                        Good,  You've Passed !
+                    </p>
+                    {% elif score_percent < 35 %}
+                    <p class="message">
+                        <img src="{% static 'imgs/fail.png' %}" alt="">
+                        Oh..., Try harder next time !
+                    </p>
+                    {% endif %}
+                {% endif %}
+                <table class="result-table mt-4" cellpadding="8">
+                    <tr>
+                        <td class="left">Name &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right">{{ user.first_name }} {{ user.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Total Questions  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right">{{ quiz.total_questions }}</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Time Limit  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right">{{ quiz.time_limit|floatformat:0 }} mins</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Time Taken  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right">{{ session.duration|format_duration|default:"Not available" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Score Obtained  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right">{{ score }}</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Maximum Score  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right">{{ total_score }}</td>
+                    </tr>
+
+                    <tr><td></td><td></td></tr>
+                    
+                    <tr>
+                        <td class="left final">Score Percentage  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right final">{{ score_percent }} %</td>
+                    </tr>
+                    <tr>
+                        <td class="left final">Result  &nbsp;&nbsp;&nbsp;: </td>
+                        <td class="right final {% if result == 'Passed' %}text-success{%else%}text-danger{%endif%}">{{ result }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <h2 class="text-center m-4">Let's go over the responses</h2>
+        {% for question in questions %}
+            {% with user_response=user_responses|get_user_response:question.id %}
+                <div class="question {% if not user_response %}not-answered{% elif user_response.selected_option == question.answer %}correct-answer{% else %}wrong-answer{% endif %}">
+                    <p><strong>Question {{ forloop.counter }}:</strong> {{ question.question }}</p>
+                    {% if question.image %}
+                        <img class="q-img mb-3" src="{{ question.image.url }}" alt="question-image">
+                    {% endif %}
+                    <ol>
+                        <li>{{ question.option_1 }}</li>
+                        <li>{{ question.option_2 }}</li>
+                        <li>{{ question.option_3 }}</li>
+                        <li>{{ question.option_4 }}</li>
+                    </ol>
+                    {% if not user_response %}
+                        <p>Submitted answer  : <strong>Not answered</strong></p>
+                        <p>Correct answer : {{ question.answer }}</p>
+                    {% elif user_response.selected_option == question.answer %}
+                        <p>Submitted answer : {{ user_response.selected_option }} <img class="r-img" src="{% static 'imgs/correct.png' %}"></p>
+                    {% else %}
+                        <p>
+                            Submitted answer : {% if not user_response %}<strong>Not answered</strong>{% else %}{{ user_response.selected_option }}{% endif %}
+                            <img class="r-img" src="{% static 'imgs/wrong.png' %}">
+                        </p>
+                        <p>Correct answer : {{ question.answer }}</p>
+                    {% endif %}
+                </div>
+            {% endwith %}
+        {% endfor %}
+
+        <div class="text-center">
+            {% if requester != 'admin' %}
+            <a href="javascript:void(0);" onclick="closeWindow();" class="btn btn-primary">Finish Review & Exit</a>
+            {% else %}
+            <a href="{% url 'admin_dash' %}" class="btn btn-primary">Back to Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="mastfoot">
+        <div class="inner text-center">
+          <p>&copy All rights reserved <a href="">AptiQuiz</a>.</p>
+        </div>
+    </footer>
+
+    <script>
+        function closeWindow() {
+            window.close();
+        }
+    </script>
+
+    <!-- Bootstrap JS (optional, if you need it) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="{% static 'assets/js/vendor/popper.min.js' %}"></script>
+    <script src="{% static 'dist/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

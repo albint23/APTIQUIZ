@@ -1,0 +1,124 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+{% load admin_tags %}
+{% load quiz_tags %}
+
+{% block content %}
+
+<div>
+    <h2 class="mb-4 ml-3">View Users</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Full Name</th>
+                    <th scope="col">Email Id</th>
+                    <th scope="col">Date Joined</th>
+                    <th scope="col">Last Login</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.date_joined }}</td>
+                    <td>{{ user.last_login }}</td>
+                    <td style="width: 30%;">
+                        <a class="btn btn-sm btn-primary" href="" data-toggle="modal"
+                            data-target="#activityModal{{user.id}}">View Activity</a>&nbsp;&nbsp;&nbsp;
+                        <a href="" class="btn btn-sm btn-danger" data-toggle="modal"
+                            data-target="#confirmModal{{user.id}}">Remove</a>
+                    </td>
+                </tr>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="confirmModal{{user.id}}" tabindex="-1" role="dialog"
+                    aria-labelledby="confirmModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmation</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you certain you want to remove {{user.first_name}} ? This action cannot be reversed.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="{% url 'remove_user' user.id %}" class="btn btn-danger">Delete</a>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No Users till now</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% for user in users %}
+    <!-- User Activity Modal -->
+    <div class="modal fade" id="activityModal{{user.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="activityModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="activityModalLabel">{{ user.first_name }} {{ user.last_name }} -
+                        Attended Quizzes</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Time Taken</th>
+                                    <th scope="col">Time Limit</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for quiz in user.id|attended_quizzes %}
+                                {% with session=user.id|find_session:quiz.id %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ quiz.name }}</td>
+                                    <td>{{ session.duration|format_duration|default:"Not available" }}</td>
+                                    <td>{{ quiz.time_limit|floatformat:0 }} mins</td>
+                                    <td>{{ session.start_time }}</td>
+                                    <td><a class="btn btn-sm btn-primary"
+                                            href="{% url 'view_result' quiz.id|hash user.id|hash %}">View Result</a>
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                                {% empty %}
+                                <tr class="text-center">
+                                    <td colspan="6">No Quizzes Attended</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

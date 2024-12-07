@@ -1,0 +1,71 @@
+{% extends 'user/user_base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container pt-4">
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="profile-pic-div">
+                <form action="{% url 'profile' %}" method="post" id="dp_form"  enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% if dp != None %}
+                    <img src="{{ dp.image.url }}" id="photo" alt="dp">
+                    {% else %}
+                    <img src="{% static 'imgs/user.png' %}" id="photo" alt="dp">
+                    {% endif %}
+                    <input type="hidden" name="form_type" value="dp_update">
+                    <input type="file" id="file" name="image" accept="image/*" onchange="checkFileSize()">
+                    <label for="file" id="uploadBtn">Choose Photo</label>
+                </form>
+            </div>
+            <div class="update-pass mt-4">
+                <h3>Change Password</h3>
+                <form class="mx-auto login-form" method="POST" action="{% url 'profile' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="pass_update">
+                    <div class="form-group mt-4 mb-4">
+                        <label for="pass">Enter your current password</label>
+                        <input type="password" class="form-control" id="pass" name="password" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 edit-div">
+            <form  class="login-form" method="POST" action="{% url 'profile' %}">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="edit_profile">
+                <h3 class="text-center mb-4">Edit Profile</h3>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="fname">First Name</label>
+                        <input type="text" class="form-control" id="fname" name="first_name" value="{{ user.first_name }}"
+                            placeholder="Enter your First Name" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="lname">Last Name</label>
+                        <input type="text" class="form-control" id="lname" name="last_name" value="{{ user.last_name }}"
+                            placeholder="Enter your Last Name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="uname">Username</label>
+                    <input type="text" class="form-control" id="uname" name="username" value="{{ user.username }}"
+                        placeholder="Enter a Username to login" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Id</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}"
+                        placeholder="Enter your email address" required>
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary mt-4">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

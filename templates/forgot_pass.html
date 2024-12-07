@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% if page == 'forgot' %}
+<div class="forgot_div">
+    <form class="mx-auto login-form" method="POST" action="{% url 'forgot_pass' %}">
+        {% csrf_token %}
+        <h4 class="text-center m-3">Forgot Password</h4>
+        <p>Enter your username and we'll send a reset password<br>mail to your registered mail id.</p>
+        <div class="form-group mt-4 mb-4">
+            <label for="uname">User Name</label>
+            <input type="text" class="form-control" id="uname" name="uname" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        <small class="form-text text-center text-muted mt-3">
+            Don't have an account ? <a class="text-primary" href="{% url 'signup' %}">Sign Up</a>
+        </small>
+    </form>
+</div>
+{% elif page == 'reset_pass' %}
+<div class="">
+    <form class="mx-auto login-form" id="resetPassForm" method="POST" action="{% url 'reset_password' id token %}">
+        {% csrf_token %}
+        <h4 class="text-center mb-4">Reset Password</h4>
+        <div class="form-group">
+            <label for="password">New Password</label>
+            <input type="password" class="form-control" id="pass" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="cpass">Confirm Password</label>
+            <input type="password" class="form-control" id="cpass" name="cpassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Reset</button>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

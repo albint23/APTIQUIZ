@@ -1,0 +1,35 @@
+Follow the steps to run the project,
+
+1. open command prompt in this folder and type the following commands one by one.
+
+2. pip install virtualenv
+
+3. virtualenv venv
+
+4. venv\Scripts\activate
+
+5. pip install -r requirements.txt
+
+6. python manage.py runserver
+
+
+ADMIN CREDENTIALS
+
+username : admin
+password : admin123
+
+this credentials is common for admin page and Django admin page (database interface).
+
+to access admin page, login with this details in the normal sign in page.
+
+to access database interface, add " /admin " to the home url ( eg: http://127.0.0.1:8000/admin ) and login with this details.
+
+
+There is a forgot password feature. where the reset password link is mailed to the user's registered email id.
+to make this feature working you need to add an email id and its password in the following file to send email from this website.
+
+aptiquiz\aptiquiz\info.py (replace the value of EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in info.py)
+
+also you need to create a passkey for the email and use that here instead of real password. refer the below video for complete django send mail feature.
+
+https://youtu.be/iGPPhzhXBFg?si=Q7oJCcvy7FCUHWcq

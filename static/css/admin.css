@@ -1,0 +1,100 @@
+body {
+    padding-top: 56px; /* Adjusted for fixed navbar */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.navbar-brand {
+    margin-left: 2rem;
+    font-size: 30px;
+}
+
+.flex-column {
+    margin-top: 20px;
+}
+
+.nav-link {
+    color: white;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.nav-link:hover {
+    color: white;
+    transform: scale(1.05);
+}
+
+.sidebar {
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    padding-top: 56px;
+    background-color: #1D2E44; /* Bootstrap default background color */
+    transition: width 0.3s ease; /* Added transition for width */
+}
+
+.main-content {
+    padding: 15px;
+    width: 100%; /* Full width by default */
+    height: 90vh;
+    transition: margin-left 0.3s ease; /* Added transition for margin-left */
+}
+
+.question-txt {
+    white-space: pre-wrap;
+}
+
+.q-img{
+    width: 50%;
+    height: 10%;
+}
+
+@media (min-width: 992px) {
+    .main-content {
+        margin-left: 250px; /* Adjusted for expanded sidebar on large screens */
+    }
+    .form-control {
+        width: 60% !important;
+    }
+
+    .msg-container {
+        transform: translateX(-10%);
+    }
+
+    .add_btn {
+        transform: translateX(-70%);
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        width: 0; /* Collapsed by default on small screens */
+    }
+
+    .sidebar.show {
+        width: 250px; /* Expanded */
+        z-index: 2; /* Ensure the sidebar is above the labels and form */
+    }
+    
+    .form-control,
+    .form-row {
+        z-index: 1; /* Send the labels and form behind the sidebar */
+    }
+
+    .sidebar .nav-link {
+        visibility: hidden; /* Hide links by default */
+        transition: visibility 0.1s ease; /* Added transition for visibility */
+    }
+
+    .sidebar.show .nav-link {
+        visibility: visible; /* Display links when sidebar is expanded */
+    }
+}
+
+@media only screen and (max-width: 600px)  {
+    .q-img{
+        width: 100%;
+        height: 30%;
+    }
+}

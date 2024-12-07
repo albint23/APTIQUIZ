@@ -1,0 +1,190 @@
+{% extends 'user/user_base.html' %}
+{% load static %}
+{% load quiz_tags %}
+{% load admin_tags %}
+{% block content %}
+
+<div class="container-fluid home-container pt-4">
+
+  <div class="welcome-container">
+    <h2>Welcome to your website, {{ user.first_name }}</h2>
+    <p>Explore our quizzes and improve your skills!</p>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="row">
+        <div class="col-md-4 col-sm-6 m-2">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-center">Quantitative Aptitude</h5>
+              <p class="card-text">There are various types of numerical aptitude test questions from various categories
+                like basic arithmetic, advanced mathematical knowledge, numerical logic, numerical reasoning, and word
+                problems.</p>
+              <a href="{% url 'view_quizzes' 'qa' %}" class="btn btn-primary btn-block">View Quizzes</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6 m-2">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-center">Logical Reasoning</h5>
+              <p class="card-text">There are several types of reasoning aptitude test questions from different
+                categories, including blood relation, direction sense, logical games, abstract reasoning, inductive
+                reasoning, diagrammatic
+                reasoning, and more.</p>
+              <a href="{% url 'view_quizzes' 'lr' %}" class="btn btn-primary btn-block">View Quizzes</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-12 m-2 d-flex justify-content-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-center">Verbal Ability</h5>
+              <p class="card-text">The Verbal Aptitude test can assess many different abilities of a candidate, such as
+                the ability to spell words correctly, use proper grammar and vocabulary, understand word meanings,
+                and/or interpret written
+                information precisely.</p>
+              <a href="{% url 'view_quizzes' 'vb' %}" class="btn btn-primary btn-block">View Quizzes</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <!-- User Circle -->
+      <div class="user-circle">
+        {% if dp %}
+        <img src="{{ dp.image.url }}" alt="User Image">
+        {% else %}
+        <img src="{% static 'imgs/user.png' %}" alt="User Image">
+        {% endif %}
+      </div>
+      <!-- User Name -->
+      <h3 class="text-center">{{ user.first_name }} {{ user.last_name}}</h3>
+      <!-- Display Average Scores with Star Ratings -->
+      <div class="ratings">
+
+        <script defer>
+          // Function to set the star rating based on a given value
+          function setStarRating(element, value) {
+
+            f_value = parseFloat(value.trim());
+
+            // Get all spans with class "fa-star"
+            var stars = element.querySelectorAll('.star-rating .fa');
+
+            // Remove the "checked" class from all spans
+            stars.forEach(function (star) {
+              star.classList.remove('checked');
+              star.classList.remove('fa-star-half-stroke'); // Remove the half-star if it was previously set
+            });
+
+            // Calculate the number of full stars
+            var fullStars = Math.floor(f_value);
+
+            // Add the "checked" class to the full stars
+            for (var i = 0; i < fullStars; i++) {
+              if (stars[i]) {
+                stars[i].classList.add('checked');
+              }
+            }
+
+            // Check if there is a half star
+            if (f_value % 1 !== 0 && stars[fullStars]) {
+              stars[fullStars].classList.add('fa-star-half-stroke');
+            }
+          }
+        </script>
+
+        <table width="100%" cellpadding="8">
+          {% for data in category_data %}
+          <tr class="rating-table">
+            <td>
+              {% if data.category == 'qa' %}Quantitative Aptitude{% endif %}
+              {% if data.category == 'lr' %}Logical Reasoning{% endif %}
+              {% if data.category == 'vb' %}Verbal Ability{% endif %}
+            </td>
+            <td class="star-rating" id="star-rating-{{forloop.counter}}">
+              <a href="" class="star-link" data-toggle="modal" data-target="#categoryModal{{forloop.counter}}">
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+              </a>
+              <input type="hidden" id="data-avg-{{forloop.counter}}" value="{{data.avg_score}}">
+              <script>
+                {
+                  var element = document.getElementById('star-rating-{{forloop.counter}}');
+                  var avg = document.getElementById('data-avg-{{forloop.counter}}').value;
+                  setStarRating(element, avg);
+                }
+              </script>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for data in category_data %}
+<div class="modal fade" id="categoryModal{{forloop.counter}}" tabindex="-1" role="dialog"
+  aria-labelledby="categoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="categoryModalLabel">
+          {% if data.category == 'qa' %}Quantitative Aptitude{% endif %}
+          {% if data.category == 'lr' %}Logical Reasoning{% endif %}
+          {% if data.category == 'vb' %}Verbal Ability{% endif %}
+           - Attended Quizzes
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="avg-score-txt">Average Score ( in 10 ) : {{ data.avg_score_in_10 }}</p>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Quiz Name</th>
+                <th scope="col">Score</th>
+                <th scope="col">Total Marks</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for quiz in data.category|get_quizzes:user.id %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ quiz.quiz.name }}</td>
+                <td>{{ quiz.score }}</td>
+                <td>{{ quiz.quiz.marks_for_each|find_total:quiz.quiz.total_questions }}</td>
+                <td><a class="btn btn-sm btn-primary"
+                    href="{% url 'view_result' quiz.quiz.id|hash user.id|hash %}" target="_blank">View
+                    Result</a></td>
+              </tr>
+              {% empty %}
+              <tr class="text-center">
+                <td colspan="6">No Quizzes attended</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

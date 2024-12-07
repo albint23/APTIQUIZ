@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'imgs/logo2.png' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/user.css' %}" rel="stylesheet">
+    <title>{{ user.first_name }} {{ user.last_name}} | {{quiz.name}}</title>
+    <style>
+        .warning-txt {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .question-txt {
+            white-space: pre-wrap;
+        }
+
+        .q-img{
+            width: 50%;
+            height: 10%;
+        }
+        
+        .question-numbers a {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            margin: 0 5px; /* spacing between circles */
+            border-radius: 50%;
+            background-color: #3498db;
+            color: #fff; 
+            text-decoration: none;
+            transform: translateY(100%);
+            font-size: 16px;
+        }
+
+        .question-numbers a.attended {
+            /* #e74c3c - code for red */
+            background-color: green; /* Adjust the background color for attended questions */
+        }
+
+        .final-text {
+            margin: 50px;
+            text-align: center;
+        }
+
+        @media only screen and (max-width: 600px)  {
+            .q-img{
+                width: 100%;
+                height: 30%;
+            }
+
+            .warning-txt {
+                font-size: 12px;
+                transform: translateY(-160%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #011F37;">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" href="#" >AptiQuiz</a>
+        
+        <!-- Toggler button for small screens -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navigation links on the right side -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto"> <!-- Use ml-auto class here -->
+                <li class="nav-item active">
+                    <b class="nav-link">{{ user.first_name }} {{ user.last_name}}</b>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" id="msg">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container q-container">
+        <div class="timer" id="timer">{{ quiz.time_limit }}:00</div>
+        {% if mode == 'submission' %}
+        <div class="text-center">
+            <h3 class="final-text">Are you certain you want to exit the quiz ?<br><br>You can still return to the questions and double-check your answers. 
+                If you are satisfied that you have finished the quiz, click the Finish Quiz button.</h3>
+            <a href="{% url 'finish_quiz' quiz.id %}" class="btn btn-primary">Finish Quiz</a>
+        </div>
+        {% else %}
+        <p class="warning-txt">Don't forget to click the submit button after you've selected an option</p>
+        <h2 class="mb-4">Question {{ current_question_number }}</h2>
+        <p class="question-txt mb-4">{{ current_question.question }}</p>
+        {% if current_question.image %}
+        <img class="q-img mb-3" src="{{ current_question.image.url }}" alt="question-image">
+        {% endif %}
+        <form id="quiz-form" method="post" action="{% url 'attend_quiz' quiz.id 'attend' %}">
+            {% csrf_token %}
+            <ul class="options">
+                <li>
+                    <input type="radio" id="optionA" name="selected_option" value="{{ current_question.option_1 }}"
+                     {% if answer != None and answer.selected_option == current_question.option_1 %}checked{%endif%}>
+                    <label for="optionA"> A. {{ current_question.option_1 }}</label>
+                </li>
+                <li>
+                    <input type="radio" id="optionB" name="selected_option" value="{{ current_question.option_2 }}"
+                     {% if answer != None and answer.selected_option == current_question.option_2 %}checked{%endif%}>
+                    <label for="optionB"> B. {{ current_question.option_2 }}</label>
+                </li>
+                <li>
+                    <input type="radio" id="optionC" name="selected_option" value="{{ current_question.option_3 }}"
+                     {% if answer != None and answer.selected_option == current_question.option_3 %}checked{%endif%}>
+                    <label for="optionC"> C. {{ current_question.option_3 }}</label>
+                </li>
+                <li>
+                    <input type="radio" id="optionD" name="selected_option" value="{{ current_question.option_4 }}"
+                     {% if answer != None and answer.selected_option == current_question.option_4 %}checked{%endif%}>
+                    <label for="optionD"> D. {{ current_question.option_4 }}</label>
+                </li>
+            </ul>
+            <button type="submit" class="btn btn-primary btn-next">Submit</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- Add a section to display question numbers -->
+    <div class="container text-center mt-4 question-numbers">
+    {% for question in questions %}
+        {% with question_number=forloop.counter %}
+            <a href="{% url 'navigate_question' quiz.id question_number %}" class="{% if question_number in answered_questions %}attended{% endif %}">{{ question_number }}</a>
+        {% endwith %}
+    {% endfor %}
+    </div>
+
+    <footer class="mastfoot">
+        <div class="inner text-center">
+          <p>&copy All rights reserved <a href="">AptiQuiz</a>.</p>
+        </div>
+    </footer>
+
+    <!-- Custom script for timer -->
+    <script>
+        // Set the initial remaining time
+        let remainingTime = parseInt("{{ remaining_time }}");
+    
+        // Update the timer every second
+        const timerElement = document.getElementById('timer');
+        const countdown = setInterval(function () {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+    
+            // Format the time and update the timer
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    
+            // Check if time is below 10 seconds
+            if (remainingTime < 10){
+                timerElement.style.color = 'red';
+            }
+    
+            // Check if time has run out
+            if (remainingTime === 0) {
+                clearInterval(countdown);
+                var redirectUrl = "{% url 'finish_quiz' quiz.id %}";
+                window.location.href = redirectUrl;
+            }
+    
+            // Decrement the remaining time
+            remainingTime--;
+        }, 1000);
+    </script>
+
+    <!-- Bootstrap JS (optional, if you need it) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="{% static 'assets/js/vendor/popper.min.js' %}"></script>
+    <script src="{% static 'dist/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

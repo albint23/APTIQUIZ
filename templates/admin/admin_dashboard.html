@@ -1,0 +1,167 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+{% load admin_tags %}
+{% load quiz_tags %}
+
+{% block content %}
+
+<div>
+    <h2 class="mb-4 ml-3">Available Quizzes</h2>
+    <div class="table-responsive">
+        <table class="table table-striped" style="width: 90%;">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Questions</th>
+                    <th scope="col">Time Limit</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizzes %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ quiz.name }}</td>
+                    <td>{{ quiz.total_questions }}</td>
+                    <td>{{ quiz.time_limit|floatformat:0 }} mins</td>
+                    <td>
+                    {% if quiz.id|is_questions %}
+                        <a class="btn btn-sm btn-primary" href="" data-toggle="modal"
+                            data-target="#questionModal{{quiz.id}}">View Questions</a> &nbsp;&nbsp;&nbsp;
+                        <a class="btn btn-sm btn-primary" href="" data-toggle="modal"
+                            data-target="#attendeesModal{{quiz.id}}">View Attendees</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-sm btn-primary">Edit</a> &nbsp;&nbsp;
+                        <a href="" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmModal{{quiz.id}}">Delete</a>
+                    {% else %}
+                        <a class="btn btn-primary" href="{% url 'add_questions' quiz.id %}">Add Questions</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-primary">Edit</a> &nbsp;&nbsp;
+                        <a href="" class="btn btn-danger" data-toggle="modal" data-target="#confirmModal{{quiz.id}}">Delete</a>
+                    {% endif %}
+                    </td>
+                </tr>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="confirmModal{{quiz.id}}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmation</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you certain you want to remove {{quiz.name}} ?  This action cannot be reversed.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-danger">Delete</a>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No Quizzes added</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% for quiz in quizzes %}
+    <!-- Questions Modal -->
+    <div class="modal fade" id="questionModal{{quiz.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="questionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="questionModalLabel">Questions - {{ quiz.name }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% for question in quiz.id|get_questions %}
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="question-txt"><strong>Question {{ forloop.counter }}:</strong> {{ question.question }}</p>
+                            {% if question.image %}
+                            <img class="q-img mb-3" src="{{ question.image.url }}" alt="question-image">
+                            {% endif %}
+                            <ol>
+                                <li>{{ question.option_1 }}</li>
+                                <li>{{ question.option_2 }}</li>
+                                <li>{{ question.option_3 }}</li>
+                                <li>{{ question.option_4 }}</li>
+                            </ol>
+                            <p>Correct answer : {{ question.answer }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <a href="{% url 'edit_questions' quiz.id %}" class="btn btn-primary">Edit</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% for quiz in quizzes %}
+    <!-- Attendees Modal -->
+    <div class="modal fade" id="attendeesModal{{quiz.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="attendeesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendeesModalLabel">{{ quiz.name }} - Attendees</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Full Name</th>
+                                    <th scope="col">Time Taken</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in quiz.id|get_sessions %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ session.user.first_name }} {{ session.user.last_name }}</td>
+                                    <td>{{ session.duration|format_duration|default:"Not available" }}</td>
+                                    <td>{{ session.start_time }}</td>
+                                    <td><a class="btn btn-sm btn-primary"href="{% url 'view_result' quiz.id|hash session.user.id|hash %}">
+                                        View Result</a></td>
+                                </tr>
+                                {% empty %}
+                                <tr class="text-center">
+                                    <td colspan="6">No Attendees till now</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

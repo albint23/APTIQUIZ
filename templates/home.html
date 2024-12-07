@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+  <main role="main" class="inner cover">
+    <h1 class="cover-heading slide-in-left">AptiQuiz - Sharpen Your Aptitude Skills !</h1>
+    <p class="lead slide-in-right">
+      Welcome to AptiQuiz, your go-to destination for honing essential aptitude skills. Whether you're preparing for exams, interviews, or 
+      just want to challenge yourself, AptiQuiz offers a comprehensive platform to boost your analytical thinking.
+    </p>
+    <p class="lead">
+      <a href="{% url 'login' %}" class="btn btn-lg btn-secondary">Get Started</a>
+    </p>
+  </main>
+
+{% endblock %}   

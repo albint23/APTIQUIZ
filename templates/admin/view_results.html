@@ -1,0 +1,42 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+{% load admin_tags %}
+{% load quiz_tags %}
+
+{% block content %}
+
+<div>
+    <h2 class="mb-4 ml-3">View Results</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Quiz</th>
+                    <th scope="col">Date & Time</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in quiz_sessions %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ session.user.first_name }} {{ session.user.last_name }}</td>
+                    <td>{{ session.quiz.name }}</td>
+                    <td>{{ session.end_time }}</td>
+                    <td style="width: 30%;">
+                        <a class="btn btn-sm btn-primary" href="{% url 'view_result' session.quiz.id|hash session.user.id|hash %}">View Result</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No Results avalilable</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
